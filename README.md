@@ -1,16 +1,18 @@
-# UART Single-Wire Keyboard Driver Library
+# UART Single-Wire Key Matrix Driver
 
-A lightweight C driver library for BitCode UART single-wire keyboard interface chips. It is designed for use with BC6xxx keyboard interface chips and BC759x 7-segment LED display driver + keyboard interface chips, including:
+A lightweight C library for BC6xxx & BC759x UART single-wire keyboard interface chips. The BC6xxx series are keyboard only and BC759x integrates a LED display driver. Supported part numbers include:
 
 - **BC6301**
 - **BC6561**
-- **BC6088**
+- **BC6088A**
 - **BC7595**
 - **BC7591**
 
-The driver converts raw UART keyboard events from the chip into easy-to-use key events for your application. It supports normal key press detection, optional key release detection, combination keys, long-press keys, and long-period no-key-activity detection.
+The driver converts raw UART keyboard events from the chip into easy-to-use key events for your application. It supports normal key press detection, optional key release detection, key combinations, long-pressed keys, and no-activity detection.
 
-![UART Single-Wire Keyboard Typical Application](img/bc6561_app_no_text.png)
+A typical application circuit is as below, All the supported chips share the same interface and same protocol, so minimum software changes are needed when you scales up or down the key matrix size.
+
+![](img/bc6301_typical.png)
 
 ---
 
@@ -23,17 +25,17 @@ The driver converts raw UART keyboard events from the chip into easy-to-use key 
 - Simple UART event input interface
 - Independent key press detection
 - Optional key release detection
-- User-defined combination keys
-- User-defined long-press keys
+- Support any key combinations
+- Support long-pressed keys
 - Optional callback mode for event-driven applications
-- Supports long-period no-key-activity detection
-- Minimal application code required
+- Supports no-keyboard-activity detection
+- Minimal user code required
 
 ---
 
 ## How It Works
 
-The supported chips output keyboard events through a UART single-wire interface. Each received byte represents one keyboard event.
+The chips output a byte each time the key matrix status changes, each received byte represents one individual key switch change, the value is the key number.
 
 | Value range     | Meaning                                                 |
 | --------------- | ------------------------------------------------------- |
@@ -45,7 +47,9 @@ For example:
 - `0x03` means key 3 is pressed.
 - `0x83` means key 3 is released, because `0x83 = 0x80 | 0x03`.
 
-The library can also map unused key values to user-defined combination keys and long-press keys. This allows your application to process advanced keyboard events in the same way as ordinary key events.
+**For simple applications, this library is not necessary. User can just execute different operations according to the received byte value.**
+
+This library provides **advanced features such as key-combination and long-press detection**, allows your application to process complicated keyboard events in the same way as ordinary single-key press.
 
 ---
 
@@ -162,7 +166,7 @@ int main(void)
 
 ---
 
-## Long-Press Key Example
+## Long-Pressed Key Example
 
 Long-press detection is based on the number of times `long_press_tick()` is called while the key remains active.
 
@@ -213,9 +217,9 @@ void TIMER_ISR(void)
 
 ---
 
-## Combination Key Example
+## Key Combination Example
 
-Combination keys are defined by arrays in this format:
+User can define any combination of keys and assign the combination a special key value, then it can be processed just like an ordinary individual key. Key combinations are defined by arrays in this format:
 
 ```c
 {key_count, defined_value, key1, key2, ...}
@@ -269,9 +273,9 @@ Each combination key requires one byte of RAM in the mapping array.
 
 ---
 
-## Detect Long Periods of No Keyboard Activity
+## Detect No Keyboard Activity
 
-A special long-press definition using original key value `0xFF` can be used to detect long periods without keyboard activity.
+A special long-press definition using key value `0xFF` can be used to detect no-activity of the keyboard. So when the user code received a key event with a value 0xFF, it means the keyboard status hasn't been changed for a certain period of time.
 
 ```c
 #include "key_scan.h"
@@ -441,12 +445,3 @@ This library is suitable for:
 - Smart home control devices
 - UART keyboard modules
 - 7-segment display and keyboard interface modules based on BC759x chips
-
----
-
-## License
-
-Please refer to the license file or distribution terms included with this repository.
-
-Copyright © Beijing Bitcode Technology Co., Ltd.  
-Website: https://bitcode.com.cn/en/
