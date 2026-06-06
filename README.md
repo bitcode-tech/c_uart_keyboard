@@ -2,11 +2,11 @@
 
 A lightweight C library for BC6xxx & BC759x UART single-wire keyboard interface chips. The BC6xxx series are keyboard only and BC759x integrates a LED display driver. Supported part numbers include:
 
-- **BC6301**
-- **BC6561**
-- **BC6088A**
-- **BC7595**
-- **BC7591**
+- **[BC6301](docs/bc6301-en.pdf)**
+- **[BC6561 (cn)](docs/bc6561.pdf)**
+- **[BC6088A (cn)](docs/bc6088.pdf)**
+- **[BC7595 (cn)](docs/bc7595.pdf)**
+- **[BC7591](docs/bc7591_en.pdf)**
 
 The driver converts raw UART keyboard events from the chip into easy-to-use key events for your application. It supports normal key press detection, optional key release detection, key combinations, long-pressed keys, and no-activity detection.
 
@@ -52,6 +52,12 @@ For example:
 This library provides **advanced features such as key-combination and long-press detection**, allows your application to process complicated keyboard events in the same way as ordinary single-key press.
 
 ---
+
+## Utility Software
+
+A utility software is come with the library, connect the key matrix chip with computer via a USB-UART converter, then the real time status of the keyboard and an interpretation of the data is shown on the computer.
+
+![](img/Screenshot-bc6561en.png) 
 
 ## Typical Workflow
 
